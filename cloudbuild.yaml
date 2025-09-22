@@ -1,11 +1,31 @@
 steps:
+  # Создание репозитория в Artifact Registry (если не существует)
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        gcloud artifacts repositories create larp-bugle-repo \
+          --repository-format=docker \
+          --location=us-central1 \
+          --description="Docker repository for larp-bugle-bot" \
+          --quiet || echo "Repository already exists"
+
+  # Настройка аутентификации Docker
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+
   # Сборка Docker образа
   - name: "gcr.io/cloud-builders/docker"
     args:
       [
         "build",
         "-t",
-        "REGION-docker.pkg.dev/$PROJECT_ID/larp-bugle-repo/larp-bugle-bot",
+        "us-central1-docker.pkg.dev/$PROJECT_ID/larp-bugle-repo/larp-bugle-bot",
         ".",
       ]
 
@@ -14,7 +34,7 @@ steps:
     args:
       [
         "push",
-        "REGION-docker.pkg.dev/$PROJECT_ID/larp-bugle-repo/larp-bugle-bot",
+        "us-central1-docker.pkg.dev/$PROJECT_ID/larp-bugle-repo/larp-bugle-bot",
       ]
 
 # Настройки логирования
@@ -24,4 +44,4 @@ options:
 
 # Настройки для развертывания
 images:
-  - "REGION-docker.pkg.dev/$PROJECT_ID/larp-bugle-repo/larp-bugle-bot"
+  - "us-central1-docker.pkg.dev/$PROJECT_ID/larp-bugle-repo/larp-bugle-bot"

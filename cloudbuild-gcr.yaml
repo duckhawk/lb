@@ -1,0 +1,17 @@
+steps:
+  # Сборка Docker образа для Container Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/larp-bugle-bot", "."]
+
+  # Отправка образа в Container Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/$PROJECT_ID/larp-bugle-bot"]
+
+# Настройки логирования
+options:
+  logging: CLOUD_LOGGING_ONLY
+  default_logs_bucket_behavior: REGIONAL_USER_OWNED_BUCKET
+
+# Настройки для развертывания
+images:
+  - "gcr.io/$PROJECT_ID/larp-bugle-bot"

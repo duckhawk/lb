@@ -14,16 +14,29 @@ gcloud artifacts repositories create larp-bugle-repo \
 ```
 
 **Сборка и развертывание:**
-```bash
-# Сборка с Artifact Registry
-gcloud builds submit --config cloudbuild.yaml
 
-# Или простая сборка
-gcloud builds submit --tag us-central1-docker.pkg.dev/PROJECT_ID/larp-bugle-repo/larp-bugle-bot
+**Вариант 1: Artifact Registry (рекомендуется)**
+```bash
+# Сборка с автоматическим созданием репозитория
+gcloud builds submit --config cloudbuild.yaml
 
 # Развертывание в Cloud Run
 gcloud run deploy larp-bugle-bot \
   --image us-central1-docker.pkg.dev/PROJECT_ID/larp-bugle-repo/larp-bugle-bot \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --set-env-vars="TELEGRAM_BOT_TOKEN=your_token,GOOGLE_CLOUD_PROJECT=your_project"
+```
+
+**Вариант 2: Container Registry (если Artifact Registry недоступен)**
+```bash
+# Сборка с Container Registry
+gcloud builds submit --config cloudbuild-gcr.yaml
+
+# Развертывание в Cloud Run
+gcloud run deploy larp-bugle-bot \
+  --image gcr.io/PROJECT_ID/larp-bugle-bot \
   --platform managed \
   --region us-central1 \
   --allow-unauthenticated \
@@ -114,6 +127,24 @@ gcloud artifacts repositories create larp-bugle-repo \
 
 # 2. Используйте новый URL для сборки
 gcloud builds submit --tag us-central1-docker.pkg.dev/PROJECT_ID/larp-bugle-repo/larp-bugle-bot
+```
+
+### Ошибка 404 при сборке в Artifact Registry
+
+Если получаете ошибку:
+```
+error parsing HTTP 404 response body: invalid character '<' looking for beginning of value
+```
+
+**Решение: Используйте Container Registry как fallback**
+```bash
+# Используйте cloudbuild-gcr.yaml для сборки в Container Registry
+gcloud builds submit --config cloudbuild-gcr.yaml
+
+# Или создайте репозиторий вручную перед сборкой
+gcloud artifacts repositories create larp-bugle-repo \
+  --repository-format=docker \
+  --location=us-central1
 ```
 
 ## Переменные окружения
