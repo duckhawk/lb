@@ -147,6 +147,23 @@ gcloud artifacts repositories create larp-bugle-repo \
   --location=us-central1
 ```
 
+### Ошибка "container failed to start and listen on the port"
+
+Если получаете ошибку:
+```
+Revision is not ready and cannot serve traffic. The user-provided container failed to start and listen on the port defined provided by the PORT=8080 environment variable
+```
+
+**Решение: Используйте server.js вместо main.js**
+```bash
+# Приложение теперь использует Express сервер
+# Убедитесь, что в Dockerfile указан правильный entry point:
+CMD ["node", "server.js"]
+
+# Health check endpoint доступен по адресу:
+# GET /health
+```
+
 ## Переменные окружения
 
 Убедитесь, что установлены следующие переменные:
@@ -165,8 +182,20 @@ docker build -t larp-bugle-bot .
 docker run -p 8080:8080 \
   -e TELEGRAM_BOT_TOKEN=your_token \
   -e GOOGLE_CLOUD_PROJECT=your_project \
+  -e WEBHOOK_URL=https://your-domain.com \
   larp-bugle-bot
+
+# Или запуск без Docker
+npm install
+node server.js
 ```
+
+## Структура приложения
+
+- **`main.js`** - основная логика Telegram бота
+- **`server.js`** - HTTP сервер для Cloud Run с Express
+- **`/health`** - health check endpoint
+- **`/`** - основной endpoint для Telegram webhook
 
 ## Мониторинг
 
