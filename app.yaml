@@ -1,0 +1,28 @@
+runtime: nodejs20
+
+# Настройки для serverless
+env: flex
+
+# Автоматическое масштабирование
+automatic_scaling:
+  min_num_instances: 0
+  max_num_instances: 10
+  target_cpu_utilization: 0.6
+
+# Настройки ресурсов
+resources:
+  cpu: 1
+  memory_gb: 0.5
+
+# Переменные окружения
+env_variables:
+  NODE_ENV: production
+
+# Настройки health check
+health_check:
+  enable_health_check: true
+  check_interval_sec: 30
+  timeout_sec: 4
+  unhealthy_threshold: 2
+  healthy_threshold: 2
+  restart_threshold: 60

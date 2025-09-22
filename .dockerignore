@@ -1,0 +1,35 @@
+# Игнорируем node_modules (будут установлены в контейнере)
+node_modules
+npm-debug.log*
+
+# Игнорируем файлы разработки
+*.spec.js
+*.spec.js.map
+test_helpers.js
+test_helpers.js.map
+
+# Игнорируем исходные TypeScript файлы (если есть)
+*.ts
+tsconfig.json
+
+# Игнорируем Git
+.git
+.gitignore
+
+# Игнорируем IDE файлы
+.vscode
+.idea
+*.swp
+*.swo
+
+# Игнорируем временные файлы
+*.tmp
+*.log
+
+# Игнорируем документацию
+README.md
+*.md
+
+# Игнорируем Docker файлы
+Dockerfile
+.dockerignore
