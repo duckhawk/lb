@@ -1,11 +1,21 @@
 steps:
   # Сборка Docker образа
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/larp-bugle-bot', '.']
-  
-  # Отправка образа в Container Registry
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/larp-bugle-bot']
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "-t",
+        "REGION-docker.pkg.dev/$PROJECT_ID/larp-bugle-repo/larp-bugle-bot",
+        ".",
+      ]
+
+  # Отправка образа в Artifact Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "push",
+        "REGION-docker.pkg.dev/$PROJECT_ID/larp-bugle-repo/larp-bugle-bot",
+      ]
 
 # Настройки логирования
 options:
@@ -14,4 +24,4 @@ options:
 
 # Настройки для развертывания
 images:
-  - 'gcr.io/$PROJECT_ID/larp-bugle-bot'
+  - "REGION-docker.pkg.dev/$PROJECT_ID/larp-bugle-repo/larp-bugle-bot"

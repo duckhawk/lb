@@ -4,16 +4,26 @@
 
 ### 1. Google Cloud Run (Рекомендуется)
 
+**Сначала создайте Artifact Registry репозиторий:**
 ```bash
-# Сборка и развертывание с правильными настройками логирования
-gcloud builds submit --config cloudbuild.yaml --tag gcr.io/PROJECT_ID/larp-bugle-bot
+# Создание репозитория в Artifact Registry
+gcloud artifacts repositories create larp-bugle-repo \
+  --repository-format=docker \
+  --location=us-central1 \
+  --description="Docker repository for larp-bugle-bot"
+```
 
-# Или простая сборка без service account
-gcloud builds submit --tag gcr.io/PROJECT_ID/larp-bugle-bot
+**Сборка и развертывание:**
+```bash
+# Сборка с Artifact Registry
+gcloud builds submit --config cloudbuild.yaml
+
+# Или простая сборка
+gcloud builds submit --tag us-central1-docker.pkg.dev/PROJECT_ID/larp-bugle-repo/larp-bugle-bot
 
 # Развертывание в Cloud Run
 gcloud run deploy larp-bugle-bot \
-  --image gcr.io/PROJECT_ID/larp-bugle-bot \
+  --image us-central1-docker.pkg.dev/PROJECT_ID/larp-bugle-repo/larp-bugle-bot \
   --platform managed \
   --region us-central1 \
   --allow-unauthenticated \
@@ -37,6 +47,29 @@ gcloud functions deploy larp-bugle-bot \
   --allow-unauthenticated \
   --source . \
   --entry-point botFunction
+```
+
+## Миграция с Container Registry на Artifact Registry
+
+### Автоматическая миграция
+```bash
+# Автоматическая миграция из GCR в Artifact Registry
+gcloud artifacts docker upgrade migrate --projects=PROJECT_ID
+```
+
+### Ручная настройка Artifact Registry
+```bash
+# 1. Создание репозитория
+gcloud artifacts repositories create larp-bugle-repo \
+  --repository-format=docker \
+  --location=us-central1
+
+# 2. Настройка аутентификации
+gcloud auth configure-docker us-central1-docker.pkg.dev
+
+# 3. Сборка и отправка образа
+docker build -t us-central1-docker.pkg.dev/PROJECT_ID/larp-bugle-repo/larp-bugle-bot .
+docker push us-central1-docker.pkg.dev/PROJECT_ID/larp-bugle-repo/larp-bugle-bot
 ```
 
 ## Решение проблем со сборкой
@@ -63,6 +96,24 @@ gcloud builds submit --tag gcr.io/PROJECT_ID/larp-bugle-bot
 gcloud builds submit \
   --tag gcr.io/PROJECT_ID/larp-bugle-bot \
   --logging=CLOUD_LOGGING_ONLY
+```
+
+### Ошибка с Container Registry (GCR deprecated)
+
+Если получаете ошибку:
+```
+Container Registry is deprecated and shutting down, please use the auto migration tool
+```
+
+**Решение: Переход на Artifact Registry**
+```bash
+# 1. Создайте репозиторий в Artifact Registry
+gcloud artifacts repositories create larp-bugle-repo \
+  --repository-format=docker \
+  --location=us-central1
+
+# 2. Используйте новый URL для сборки
+gcloud builds submit --tag us-central1-docker.pkg.dev/PROJECT_ID/larp-bugle-repo/larp-bugle-bot
 ```
 
 ## Переменные окружения
