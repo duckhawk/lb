@@ -5,8 +5,13 @@
 ### 1. Google Cloud Run (Рекомендуется)
 
 ```bash
-# Сборка и развертывание
+# Сборка и развертывание с правильными настройками логирования
+gcloud builds submit --config cloudbuild.yaml --tag gcr.io/PROJECT_ID/larp-bugle-bot
+
+# Или простая сборка без service account
 gcloud builds submit --tag gcr.io/PROJECT_ID/larp-bugle-bot
+
+# Развертывание в Cloud Run
 gcloud run deploy larp-bugle-bot \
   --image gcr.io/PROJECT_ID/larp-bugle-bot \
   --platform managed \
@@ -32,6 +37,32 @@ gcloud functions deploy larp-bugle-bot \
   --allow-unauthenticated \
   --source . \
   --entry-point botFunction
+```
+
+## Решение проблем со сборкой
+
+### Ошибка с service_account и логированием
+
+Если получаете ошибку:
+```
+Failed to trigger build: if 'build.service_account' is specified, the build must either (a) specify 'build.logs_bucket', (b) use the REGIONAL_USER_OWNED_BUCKET build.options.default_logs_bucket_behavior option, or (c) use either CLOUD_LOGGING_ONLY / NONE logging options
+```
+
+**Решение 1: Используйте cloudbuild.yaml**
+```bash
+gcloud builds submit --config cloudbuild.yaml
+```
+
+**Решение 2: Простая сборка без service account**
+```bash
+gcloud builds submit --tag gcr.io/PROJECT_ID/larp-bugle-bot
+```
+
+**Решение 3: Укажите опции логирования**
+```bash
+gcloud builds submit \
+  --tag gcr.io/PROJECT_ID/larp-bugle-bot \
+  --logging=CLOUD_LOGGING_ONLY
 ```
 
 ## Переменные окружения
