@@ -2,6 +2,9 @@
 node_modules
 npm-debug.log*
 
+# Игнорируем package-lock.json (будет скопирован отдельно)
+# package-lock.json
+
 # Игнорируем файлы разработки
 *.spec.js
 *.spec.js.map
